@@ -1,31 +1,8 @@
 import React from "react";
 import styled, { ThemeProvider } from "styled-components/macro";
+import theme from "../themes";
 import SButton from "./SButton";
 
-
-
-const theme = {
-    color: {
-      primary: 'black',
-      secondary: 'white'
-    },
-    font: {
-      size: {
-        extraSmall: '14px',
-        small: '16px',
-        medium: '18px',
-        large: '20px',
-        extraLarge: '24px',
-      },
-      family: 'sans-serif',
-    },
-    breakpoint: {
-      mobile: '375px',
-      tablet: '600px',
-      laptop: '1200px',
-      desktop: '1600px',
-    },
-};
 
 const Button = styled(SButton)`
   color: ${({theme}) => theme.color.primary};
@@ -48,13 +25,13 @@ const invertTheme = (theme) => ({
     }
 })
 
-const ThemedButton = () => {
+const ThemedButton = ({ color }) => {
   return (
       <div>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={theme(color)}>
             <Button>Default Theme</Button>
         </ThemeProvider>
-        <ThemeProvider theme={invertTheme(theme)}>
+        <ThemeProvider theme={invertTheme(theme(color))}>
           <Button>Inverted Theme</Button>
         </ThemeProvider>
       </div>

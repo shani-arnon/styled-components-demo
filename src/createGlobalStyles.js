@@ -1,4 +1,5 @@
 import { createGlobalStyle } from "styled-components";
+import Wrapper  from "./components/common/Wrapper";
 
 const GlobalStyle = createGlobalStyle`
 *,
@@ -10,7 +11,12 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     font-family: Open-Sans, Helvetica, Sans-Serif;
-    height: 100%;
+    height: 100vh;
+
+    div${Wrapper} {
+    background: purple;
+    /* //${({color}) => color}; */
+  }
   }
 `;
 
