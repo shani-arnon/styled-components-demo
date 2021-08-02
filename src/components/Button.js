@@ -34,7 +34,7 @@ const ResetButton = styled(SButton)`
     visibility:  ${({bgColor}) => bgColor || "hidden"};
 `;
 
-export default () => {
+const Button = () => {
     const [bgColor, setBgColor] = useState("");
 
     return (
@@ -62,3 +62,4 @@ export default () => {
         </>
     );
 };
+export default Button;
