@@ -1,70 +1,175 @@
-# Getting Started with Create React App
+# Getting Started with Styled-components
+[https://styled-components.com/docs/basics]
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[https://medium.com/building-crowdriff/styled-components-to-use-or-not-to-use-a6bb4a7ffc21]
 
-## Available Scripts
 
-In the project directory, you can run:
+## Motivation
 
-### `yarn start`
+* Automatic critical CSS: styled-components keeps track of which components are rendered on a page and injects their styles and nothing else, fully automatically. Combined with code splitting, this means your users load the least amount of code necessary.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+* No class name bugs: styled-components generates unique class names for your styles. You never have to worry about duplication, overlap or misspellings.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+* Dynamic styling: adapting the styling of a component based on its props or a global theme is simple and intuitive without having to manually manage dozens of classes.
 
-### `yarn test`
+* Simple maintenance: you never have to hunt across different files to find the styling affecting your component, so maintenance is a piece of cake no matter how big your codebase is.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* Automatic vendor prefixing: write your CSS to the current standard and let styled-components handle the rest.
 
-### `yarn build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Tips
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* Define Styled Components outside of the render method -
+Otherwise, it will be recreated on every single render pass.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
+* The ThemeProvider - is used as a wrapper that injects theme props into all of its child components
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+* The CSS Function - With Styled Components’ css function, you can use props to conditionally render css, which meant that we no longer had to render conditional class names based on props. This reduces clutter in your components as well as maintains a separation of concerns between CSS and JavaScript.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Example usage of css func:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+#### No css func
+```
+import styled from 'styled-components';
+const Button = styled.button`
+  color: ${props => props.isSecondary ? 'blue' : 'white'};
+`
+```
+#### With css func
+```
+const Button = styled.button`
+  color: 'white';
+  ${props => props.isSecondary && css`
+        color: 'blue';
+  `}
+`
+// Using the isSecondary iteration of the styled component
+  <Button isSecondary />
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+* Testing - [https://github.com/styled-components/jest-styled-components]
 
-## Learn More
+Testing styled components painless by creating consistent class names and allowing you to assert specific CSS rules
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Below is an example of an assertion that Jest SC:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+expect(button).toHaveStyleRule('color', 'blue');
+```
 
-### Code Splitting
+#### Pseudoelements, pseudoselectors, and nesting
+* The preprocessor stylis, supports scss-like syntax for automatically nesting styles.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+* The ampersand (&) can be used to refer back to the main component. Here are some more examples of its potential usage:
 
-### Analyzing the Bundle Size
+```
+&:hover {
+    color: red; // hover on the element
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+& ~ & {
+    background: tomato; //  sibling, but maybe not directly next to it
+}
 
-### Making a Progressive Web App
+& + & {
+    background: lime; // sibling next to the element
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+&.something {
+    background: orange; // element tagged with an additional CSS class ".something"
+}
 
-### Advanced Configuration
+.something-else & {
+    border: 1px solid; // element inside another element labeled ".something-else"
+}
+```
+* Note: If you put selectors in without the ampersand, they will refer to children of the component.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The ampersand can be used to increase the specificity of rules on the component; this can be useful if you are dealing with a mixed styled-components and vanilla CSS environment:
 
-### Deployment
+```
+const Thing = styled.div`
+  && {
+    color: blue;
+  }
+`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+const GlobalStyle = createGlobalStyle`
+  div${Thing} {
+    color: red;
+  }
+`
 
-### `yarn build` fails to minify
+render(
+  <React.Fragment>
+    <GlobalStyle />
+    <Thing>
+      I'm blue, da ba dee da ba daa
+    </Thing>
+  </React.Fragment>
+)
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+#### Attaching additional props
+
+To avoid unnecessary wrappers that just pass on some props to the rendered component, or element, you can use the .attrs constructor. It allows you to attach additional props (or "attributes") to a component.
+
+```
+const Input = styled.input.attrs(props => ({
+  // we can define static props
+  type: "text",
+
+  // or we can define dynamic ones
+  size: props.size || "1em",
+}))`
+  color: palevioletred;
+  font-size: 1em;
+  border: 2px solid palevioletred;
+  border-radius: 3px;
+
+  /* here we use the dynamically computed prop */
+  margin: ${props => props.size};
+  padding: ${props => props.size};
+`;
+
+render(
+  <div>
+    <Input placeholder="A small text input" />
+    <br />
+    <Input placeholder="A bigger text input" size="2em" />
+  </div>
+);
+```
+
+
+##### Overriding .attr
+
+```
+const Input = styled.input.attrs(props => ({
+  type: "text",
+  size: props.size || "1em",
+}))`
+  border: 2px solid palevioletred;
+  margin: ${props => props.size};
+  padding: ${props => props.size};
+`;
+
+// Input's attrs will be applied first, and then this attrs obj
+const PasswordInput = styled(Input).attrs({
+  type: "password",
+})`
+  // similarly, border will override Input's border
+  border: 2px solid aqua;
+`;
+
+render(
+  <div>
+    <Input placeholder="A bigger text input" size="2em" />
+    <br />
+    {/* Notice we can still use the size attr from Input */}
+    <PasswordInput placeholder="A bigger password input" size="2em" />
+  </div>
+);
+```
+
