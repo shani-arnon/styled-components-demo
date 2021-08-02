@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import CreateGlocalStyles from "./createGlobalStyles";
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    <CreateGlocalStyles />
   </React.StrictMode>,
   document.getElementById('root')
 );
